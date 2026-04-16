@@ -29,7 +29,7 @@ export function FilterSidebar() {
   };
 
   return (
-    <Card className="w-64 h-full flex flex-col bg-black/40 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden shadow-2xl">
+    <Card className="w-full h-full flex flex-col bg-black/40 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden shadow-2xl">
       <div className="p-5 border-b border-white/5 flex justify-between items-center bg-white/5">
         <h3 className="font-bold text-sm tracking-widest text-violet-100 uppercase">Filters</h3>
         <button 

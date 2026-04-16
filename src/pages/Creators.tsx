@@ -84,7 +84,7 @@ export default function Creators() {
       </div>
 
       <div className="flex-1 flex overflow-hidden w-full relative">
-        <div className="w-64 shrink-0 shrink-0 h-full overflow-hidden hidden md:block pl-6 pb-6">
+        <div className="w-[280px] shrink-0 h-full hidden md:block pl-6 pb-6 pr-2">
           <FilterSidebar />
         </div>
         
