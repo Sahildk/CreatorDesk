@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { downloadCsv } from '@/lib/csvUtils';
 
 export default function Shortlist() {
-  const { creators, activeCampaignId, campaigns, classifications } = useAppStore();
+  const { creators, activeCampaignId, campaigns, classifications, setCreatorStatus } = useAppStore();
   const activeCamp = campaigns.find(c => c.id === activeCampaignId);
   const campClass = classifications[activeCampaignId || ''] || {};
 
@@ -29,6 +29,12 @@ export default function Shortlist() {
   }, [creators, campClass]);
 
   const totalBudget = columnCreators.shortlisted.reduce((sum, c) => sum + c.cost_per_post, 0);
+
+  const handleDrop = (creatorId: string, status: CreatorStatus) => {
+    if (activeCampaignId) {
+      setCreatorStatus(activeCampaignId, creatorId, status);
+    }
+  };
 
   if (!activeCamp) {
     return (
@@ -79,7 +85,21 @@ export default function Shortlist() {
       <div className="flex-1 overflow-x-auto">
         <div className="flex gap-6 h-full min-w-[900px]">
           {columns.map(col => (
-             <div key={col.id} className={`flex-1 flex flex-col rounded-xl border ${col.color} p-4`}>
+             <div 
+               key={col.id} 
+               className={`flex-1 flex flex-col rounded-xl border ${col.color} p-4 transition-colors`}
+               onDragOver={(e) => {
+                 e.preventDefault();
+                 e.dataTransfer.dropEffect = 'move';
+               }}
+               onDrop={(e) => {
+                 e.preventDefault();
+                 const creatorId = e.dataTransfer.getData('creatorId');
+                 if (creatorId) {
+                   handleDrop(creatorId, col.id);
+                 }
+               }}
+             >
                <div className="flex justify-between items-center mb-4 px-1">
                  <h3 className="font-semibold">{col.title}</h3>
                  <span className="bg-black/30 px-2 py-0.5 rounded text-xs text-muted-foreground">
@@ -89,12 +109,22 @@ export default function Shortlist() {
                
                <div className="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 pb-4 plugin-scrollbar-hidden">
                  {columnCreators[col.id].map(creator => (
-                   <CreatorCard key={creator.id} creator={creator} compact />
+                   <div
+                     key={creator.id}
+                     draggable
+                     onDragStart={(e) => {
+                       e.dataTransfer.setData('creatorId', creator.id);
+                       e.dataTransfer.effectAllowed = 'move';
+                     }}
+                     className="cursor-grab active:cursor-grabbing hover:-translate-y-0.5 transition-transform"
+                   >
+                     <CreatorCard creator={creator} compact />
+                   </div>
                  ))}
                  
                  {columnCreators[col.id].length === 0 && (
-                   <div className="flex-1 border-2 border-dashed border-white/5 rounded-xl flex items-center justify-center p-8">
-                     <span className="text-sm text-muted-foreground/50">Drop here (Native DND TBD)</span>
+                   <div className="flex-1 border-2 border-dashed border-white/5 rounded-xl flex items-center justify-center p-8 pointer-events-none">
+                     <span className="text-sm text-muted-foreground/50">Drop here</span>
                    </div>
                  )}
                </div>
